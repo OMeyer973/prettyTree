@@ -34,11 +34,11 @@ float tmpSeed = 0;
 float fixedSeed = 0;
 float tmpFixedSeed = 0;
 
-color trunkColor = #00EDE0;//#1B002B;
-color branchColor = #F5EE34; //#43e97b;
-color leafColor = #E82503;//#ffffff;
+color trunkColor = #00EDE0;
+color branchColor = #F5EE34;
+color leafColor = #E82503;
 
-color lowSkyColor = #0250c5/*#a6c0fe*/, highSkyColor = #d43f8d;//#f68084;
+color lowSkyColor = #d43f8d, highSkyColor = #0250c5;
 color lowFloorColor = #e772d1, highFloorColor = #6bc9c1;
 color sunColor = color(255, 204, 65, 220);
 color pathColor = color(255, 255, 255, 128);
@@ -168,7 +168,7 @@ void setup () {
     .setLabel("composition")
     .setPosition(10, 115)
     .setSize((int)(UIX*0.3), 10)
-    .setRange(0, 1)
+    .setRange(0, 4)
     ;
 
   cp5.addSlider("colorPalette")
@@ -185,6 +185,7 @@ void setup () {
 void draw () {
   clear();
   if (animate) {
+    updatePalette();
     drawScene();
   }
   image(canvas, 0, UIY);
@@ -200,13 +201,13 @@ void generate() {
 
 void updatePalette() {
   switch (colorPalette) {
-  case 0:
+  case 3:
     trunkColor = #00EDE0;//#1B002B;
     branchColor = #F5EE34; //#43e97b;
     leafColor = #E82503;//#ffffff;
 
-    lowSkyColor = #0250c5/*#a6c0fe*/;
-    highSkyColor = #d43f8d;//#f68084;
+    highSkyColor = #0250c5/*#a6c0fe*/;
+    lowSkyColor = #d43f8d;//#f68084;
     lowFloorColor = #e772d1;
     highFloorColor = #6bc9c1;
     sunColor = color(255, 204, 65, 220);
@@ -218,12 +219,38 @@ void updatePalette() {
     branchColor = #43e97b;
     leafColor = #ffffff;
 
-    lowSkyColor = #a6c0fe;
-    highSkyColor = #f68084;
+    highSkyColor = #a6c0fe;
+    lowSkyColor = #f68084;
     lowFloorColor = #e772d1;
     highFloorColor = #6bc9c1;
     sunColor = color(197, 142, 255, 255);
     pathColor = color(20, 30, 70, 128);
+    break;
+
+  case 2:
+    trunkColor = #0e0402;
+    branchColor = #722418;
+    leafColor = #d7492e;
+
+    highSkyColor = #4d83c1;
+    lowSkyColor = #f5ba76;
+    lowFloorColor = #d4753b;
+    highFloorColor = #f5ba76;
+    sunColor = color(255, 255, 206, 230);
+    pathColor = color(57, 0, 7, 100);
+    break;
+
+  case 0:
+    trunkColor = #4c3828;
+    branchColor = #58704c;
+    leafColor = #bcc329;
+
+    highSkyColor = #2958dc;
+    lowSkyColor = #6295d0;
+    lowFloorColor = #79482d;
+    highFloorColor = #c5a68a;
+    sunColor = color(250, 252, 239, 200);
+    pathColor = color(67, 58, 51, 120);
     break;
 
   default:
@@ -246,6 +273,15 @@ void drawScene() {
   case 1:
     drawBouquetScene(canvas);
     break;
+  case 2:
+    drawSingleTreeScene(canvas);
+    break;
+  case 3:
+    drawPlanetScene(canvas);
+    break;
+  case 4:
+    drawPatternScene(canvas);
+    break;
   default:
     break;
   }
@@ -255,15 +291,16 @@ void drawScene() {
 void drawVaporwaveScene(PGraphics pg) {
   if (!transparentBackground) {
     pg.background(#ffffff);
-    verticalGradient(pg, new PVector(0, 0), new PVector (canvasSize, canvasSize), lowSkyColor, highSkyColor); 
+    verticalGradient(pg, new PVector(0, 0), new PVector (canvasSize, canvasSize), highSkyColor, lowSkyColor); 
     pg.noStroke();
     pg.fill(sunColor);
     pg.ellipse(canvasSize * 0.5, 0.9 * canvasSize, 0.6*canvasSize, 0.6*canvasSize); 
-    verticalGradient(pg, new PVector(0, 0.83 * canvasSize), new PVector (canvasSize, canvasSize), lowFloorColor, highFloorColor);
-    pg.fill(pathColor);
-    pg.noStroke();
-    pg.triangle(canvasSize * 0.5, canvasSize * 0.83, -0.1 * canvasSize, canvasSize, 1.1 * canvasSize, canvasSize);
   }
+  verticalGradient(pg, new PVector(0, 0.83 * canvasSize), new PVector (canvasSize, canvasSize), lowFloorColor, highFloorColor);
+  pg.fill(pathColor);
+  pg.noStroke();
+  pg.triangle(canvasSize * 0.5, canvasSize * 0.83, -0.1 * canvasSize, canvasSize, 1.1 * canvasSize, canvasSize);
+
   drawBranch(pg, new PVector(canvasSize * 0.4, 0.85 * canvasSize), new PVector(0, -canvasSize*branchLength*0.3), 0);  
   drawBranch(pg, new PVector(canvasSize * 0.6, 0.85 * canvasSize), new PVector(0, -canvasSize*branchLength*0.3), 0);  
   drawBranch(pg, new PVector(canvasSize * 0.3, 0.88 * canvasSize), new PVector(0, -canvasSize*branchLength*0.6), 0);  
@@ -275,20 +312,69 @@ void drawVaporwaveScene(PGraphics pg) {
 void drawBouquetScene(PGraphics pg) {
   if (!transparentBackground) {
     pg.background(#ffffff);
-    verticalGradient(pg, new PVector(0, 0), new PVector (canvasSize, canvasSize), lowSkyColor, highSkyColor); 
-    pg.fill(pathColor);
-    pg.noStroke();
-    pg.triangle(canvasSize * 0.5, canvasSize * 0.83, 0.1 * canvasSize, 0.1 * canvasSize, 0.9 * canvasSize, 0.1 * canvasSize);
-    
-    pg.noStroke();
-    pg.fill(sunColor);
-    pg.ellipse(canvasSize * 0.5, canvasSize * 0.35, 0.4*canvasSize, 0.4*canvasSize); 
-    //verticalGradient(pg, new PVector(0, 0.83 * canvasSize), new PVector (canvasSize, canvasSize), lowFloorColor, highFloorColor);
+    verticalGradient(pg, new PVector(0, 0), new PVector (canvasSize, canvasSize), highSkyColor, lowSkyColor); 
   }
+  pg.fill(pathColor);
+  pg.noStroke();
+  pg.triangle(canvasSize * 0.5, canvasSize * 0.83, 0.1 * canvasSize, 0.1 * canvasSize, 0.9 * canvasSize, 0.1 * canvasSize);
+  
+  pg.noStroke();
+  pg.fill(sunColor);
+  pg.ellipse(canvasSize * 0.5, canvasSize * 0.35, 0.4*canvasSize, 0.4*canvasSize); 
+  
   drawBranch(pg, new PVector(canvasSize * 0.4, 0.95 * canvasSize), new PVector(-canvasSize*0.06, -canvasSize*branchLength*0.6), 0);  
   drawBranch(pg, new PVector(canvasSize * 0.6, 0.95 * canvasSize), new PVector(canvasSize*0.06, -canvasSize*branchLength*0.6), 0);  
   drawBranch(pg, new PVector(canvasSize * 0.5, canvasSize), new PVector(0, -canvasSize*branchLength), 0);  
-  radialGradient(pg, new PVector(canvasSize * 0.5, canvasSize * 1.1), canvasSize * 0.5, lowFloorColor, highFloorColor);
+  radialGradient(pg, new PVector(canvasSize * 0.5, canvasSize * 1.1), canvasSize * 0.5, highFloorColor, lowFloorColor);
+}
+
+void drawSingleTreeScene(PGraphics pg) {
+  if (!transparentBackground) {
+    pg.background(#ffffff);
+    verticalGradient(pg, new PVector(0, 0), new PVector (canvasSize, canvasSize), highSkyColor, lowSkyColor); 
+  }
+  drawBranch(pg, new PVector(canvasSize * 0.5, canvasSize * 0.9), new PVector(0, -canvasSize*branchLength*0.8), 0);  
+}
+
+void drawPlanetScene(PGraphics pg) {
+  if (!transparentBackground) {
+    pg.background(#ffffff);
+    verticalGradient(pg, new PVector(0, 0), new PVector (canvasSize, canvasSize), highSkyColor, lowSkyColor); 
+  }
+  
+  pg.noStroke();
+  pg.fill(pathColor);
+  pg.ellipse(canvasSize*0.5, canvasSize*0.5, canvasSize*0.32, canvasSize*0.32);
+  int nbTrees = (int)fixedSeededRandom(3,24);
+  for (int i=0; i<nbTrees; i++) {
+    float theta = i*2*PI/nbTrees;
+    float currTreeLength = canvasSize*branchLength*0.5*fixedSeededRandom(0.2,1);
+    drawBranch(pg, new PVector(canvasSize*0.5 + canvasSize * 0.1 * cos(theta), canvasSize*0.5 + canvasSize * 0.1 * sin(theta)), new PVector(currTreeLength*cos(theta), currTreeLength*sin(theta)), 0);
+  }
+  radialGradient(pg, new PVector(canvasSize * 0.5 , canvasSize * 0.5), canvasSize * 0.24, highFloorColor, lowFloorColor);
+}
+
+void drawPatternScene(PGraphics pg) {
+  if (!transparentBackground) {
+    pg.background(#ffffff);
+    verticalGradient(pg, new PVector(0, 0), new PVector (canvasSize, canvasSize), highSkyColor, lowSkyColor); 
+  }
+  
+  pg.noStroke();
+  pg.fill(pathColor);
+  //pg.ellipse(canvasSize*0.5, canvasSize*0.5, canvasSize*0.32, canvasSize*0.32);
+  
+  int nbRows = (int)fixedSeededRandom(1,8);
+  
+  for (int i=0; i<nbRows; i++) {
+    for (int j=0; j<nbRows; j++) {
+      float theta = -PI/2;
+      float currTreeLength = canvasSize*branchLength /nbRows;
+      drawBranch(pg, new PVector(canvasSize*(((float)i+0.5)/nbRows), canvasSize*(((float)j+0.9)/nbRows)), new PVector(currTreeLength*cos(theta), currTreeLength*sin(theta)), 0);
+    }
+  }
+  //radialGradient(pg, new PVector(canvasSize * 0.5 , canvasSize * 0.5), canvasSize * 0.24, highFloorColor, lowFloorColor);
+
 }
 
 //draw a tree branch and it's children until last iteration
@@ -323,6 +409,7 @@ void verticalGradient(PGraphics pg, PVector bottomLeft, PVector topRight, color 
     float inter = map(i, bottomLeft.y, topRight.y, 0, 1);
     color c = lerpColor(bottomColor, topColor, inter);
     pg.stroke(c);
+    pg.strokeWeight(1);
     pg.line(bottomLeft.x, i, topRight.x, i);
   }
 }
@@ -340,13 +427,13 @@ void radialGradient(PGraphics pg, PVector center, float radius, color centerColo
 
 //random vamue but using a seed
 float seededRandom(float min, float max) {
-  tmpSeed += 5;
+  tmpSeed += 5*PI;
   return map(noise(tmpSeed), 0, 1, min, max);
 }
 
 //random vamue but using a fixed seed
 float fixedSeededRandom(float min, float max) {
-  tmpFixedSeed += 5;
+  tmpFixedSeed += 5*PI;
   return map(noise(tmpFixedSeed), 0, 1, min, max);
 }
 
