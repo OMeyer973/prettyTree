@@ -5,18 +5,19 @@ import controlP5.*;
 
 PGraphics canvas;
 
-int canvasSize = 800, UIX = canvasSize, UIY = 120;
+int canvasSize = 800, UIX = canvasSize, UIY = 140;
 int sizeX = canvasSize, sizeY = UIY + canvasSize; //must be the size of the input image
 
 
 //computing variables
-float branchLength = 0.3;
+float branchLength = 0.4;
 float branchLengthFactor = 0.73;
-float branchHeight = 0.5;
-float branchHeightFactor = 1;
+float branchHeight = 0.2;
+float branchHeightFactor = 1.3;
+float branchLengthHeightFactor = 0.15;
 float branchAngle = 0.3;
 float branchAngleFactor = 1.15;
-float branchWidth = 17;
+float branchWidth = 10;
 float branchWidthFactor = 0.7;
 
 int nbNextBranches = 8;
@@ -72,55 +73,70 @@ void setup () {
   cp5.addSlider("branchLength")
     .setLabel("branch length")
     .setPosition(10, 40)
-    .setSize((int)(UIX*0.4), 10)
+    .setSize((int)(UIX*0.3), 10)
     .setRange(0, 1)
     ;
 
   cp5.addSlider("branchLengthFactor")
     .setLabel("branch length factor")
     .setPosition(UIX/2, 40)
-    .setSize((int)(UIX*0.4), 10)
+    .setSize((int)(UIX*0.3), 10)
     .setRange(0, 1)
     ;
 
   cp5.addSlider("branchAngle")
     .setLabel("branch angle")
     .setPosition(10, 60)
-    .setSize((int)(UIX*0.4), 10)
+    .setSize((int)(UIX*0.3), 10)
     .setRange(0, PI * 0.5)
     ;
 
   cp5.addSlider("branchAngleFactor")
     .setLabel("branch angle factor")
     .setPosition(UIX/2, 60)
-    .setSize((int)(UIX*0.4), 10)
+    .setSize((int)(UIX*0.3), 10)
     .setRange(0, 2)
     ;
 
   cp5.addSlider("branchWidth")
     .setLabel("branch width")
     .setPosition(10, 80)
-    .setSize((int)(UIX*0.4), 10)
+    .setSize((int)(UIX*0.3), 10)
     .setRange(0, canvasSize * 0.1)
     ;
 
   cp5.addSlider("branchWidthFactor")
     .setLabel("branch width factor")
     .setPosition(UIX/2, 80)
-    .setSize((int)(UIX*0.4), 10)
+    .setSize((int)(UIX*0.3), 10)
     .setRange(0, 2)
     ;
+    
+  cp5.addSlider("branchHeight")
+    .setLabel("branch height")
+    .setPosition(10, 100)
+    .setSize((int)(UIX*0.3), 10)
+    .setRange(0, 1)
+    ;
+
+  cp5.addSlider("branchHeightFactor")
+    .setLabel("branch height factor")
+    .setPosition(UIX/2, 100)
+    .setSize((int)(UIX*0.3), 10)
+    .setRange(0, 2)
+    ;
+
   cp5.addSlider("nbNextBranches")
     .setLabel("childs per branch")
-    .setPosition(10, 100)
-    .setSize((int)(UIX*0.4), 10)
+    .setPosition(10, 120)
+    .setSize((int)(UIX*0.3), 10)
     .setRange(1, 20)
     ;
 
   cp5.addSlider("maxIterations")
     .setLabel("depth of tree")
-    .setPosition(UIX/2, 100)
-    .setSize((int)(UIX*0.4), 10)
+    .setPosition(UIX/2, 120)
+    .setSize((int)(UIX*0.3), 10)
     .setRange(0, 10)
     ;
 
@@ -143,7 +159,7 @@ void generateTree() {
     canvas.fill(sunColor);
     canvas.ellipse(canvasSize * 0.5, 0.9 * canvasSize, 0.6*canvasSize, 0.6*canvasSize); 
     verticalGradient(canvas, new PVector(0, 0.83 * canvasSize), new PVector (canvasSize, canvasSize), #e772d1, #6bc9c1);
-    canvas.fill(color(255,255,255,128));
+    canvas.fill(color(255,255,255,50));
     canvas.noStroke();
     canvas.triangle(canvasSize * 0.5, canvasSize * 0.83, -0.1 * canvasSize, canvasSize, 1.1 * canvasSize, canvasSize);
 }
@@ -199,11 +215,14 @@ void drawBranch(PGraphics pg, PVector origin, PVector direction, float branchWid
     int nextNbNextBranches = (int)random(1, nbNextBranches);
 
     for (int i=0; i<nextNbNextBranches; i++) {
-      PVector nextOrigin = PVector.add(origin, PVector.mult(direction, random(branchHeight, 1)));
+      float currBranchHeight = clamp01(random(branchHeight * pow(branchHeightFactor, iter), 1));
+      PVector nextOrigin = PVector.add(origin, PVector.mult(direction, currBranchHeight));
+      float maxCurrBranchAngle = branchAngle * pow(branchAngleFactor, iter);
+      float currBranchLength = random(branchLengthFactor*0.8, branchLengthFactor*1.2) * (1-currBranchHeight*branchLengthHeightFactor);
       PVector nextDirection = direction.copy();
       nextDirection
-        .rotate(random(-branchAngle * pow(branchAngleFactor, iter), branchAngle * pow(branchAngleFactor, iter)))
-        .mult(random(branchLengthFactor*0.8, branchLengthFactor*1.2));
+        .rotate(random(-maxCurrBranchAngle, maxCurrBranchAngle))
+        .mult(currBranchLength);
       float nextBranchWidth = branchWidth * branchWidthFactor;
 
       drawBranch(pg, nextOrigin, nextDirection, nextBranchWidth, iter+1);
@@ -211,6 +230,9 @@ void drawBranch(PGraphics pg, PVector origin, PVector direction, float branchWid
   }
 }
 
+float clamp01(float f) {
+  return min(max(0,f),1);
+}
 
 void export() {
   canvas.save("Tree-" + year() + month() + day() + hour() + minute() + second() + ".png");
