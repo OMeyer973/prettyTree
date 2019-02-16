@@ -59,39 +59,45 @@ void setup () {
 
   cp5 = new ControlP5(this);
 
-  cp5.addButton("generate")
-    .setLabel("generate")
+  cp5.addButton("generateScene")
+    .setLabel("generate new scene")
     .setPosition(10, 10)
+    .setSize(90, 20)
+    ;
+
+  cp5.addButton("updateScene")
+    .setLabel("update scene")
+    .setPosition(120, 10)
     .setSize(90, 20)
     ;
 
   cp5.addButton("export")
     .setLabel("export image")
-    .setPosition(120, 10)
+    .setPosition(230, 10)
     .setSize(90, 20)
     ;
 
   cp5.addToggle("transparentBackground")
     .setLabelVisible(false)
-    .setPosition(230, 10)
+    .setPosition(340, 10)
     .setSize(50, 20)
     ;
 
   cp5.addTextlabel("bgLabel")
     .setText("TRANSPARENT BACKGROUND")
-    .setPosition(285, 15)
+    .setPosition(395, 15)
     ;
 
 
   cp5.addToggle("animate")
     .setLabelVisible(false)
-    .setPosition(430, 10)
+    .setPosition(540, 10)
     .setSize(50, 20)
     ;
 
   cp5.addTextlabel("animateLabel")
     .setText("ANIMATE /!\\ LAGGY")
-    .setPosition(485, 15)
+    .setPosition(595, 15)
     ;
 
   cp5.addSlider("branchLength")
@@ -105,7 +111,7 @@ void setup () {
     .setLabel("branch length factor")
     .setPosition(UIX/2, 35)
     .setSize((int)(UIX*0.3), 10)
-    .setRange(0, 1)
+    .setRange(0, 1.5)
     ;
 
   cp5.addSlider("branchAngle")
@@ -175,39 +181,43 @@ void setup () {
     .setLabel("color palette")
     .setPosition(UIX/2, 115)
     .setSize((int)(UIX*0.3), 10)
-    .setRange(0, 1)
+    .setRange(0, 3)
     ;
 
   canvas = createGraphics(canvasSize, canvasSize, P2D);
-  drawScene();
+  generateScene();
 }
 
 void draw () {
   clear();
   if (animate) {
-    updatePalette();
-    drawScene();
+    updateScene();
   }
   image(canvas, 0, UIY);
 }
 
+//updates the scene with the current parameters
+void updateScene() {
+  updatePalette();
+  drawScene();  
+}
+
 //generate a new scene with the given parameters
-void generate() {
+void generateScene() {
   seed = random(10000);
   fixedSeed = random(10000);
-  updatePalette();
-  drawScene();
+  updateScene();
 }
 
 void updatePalette() {
   switch (colorPalette) {
-  case 3:
-    trunkColor = #00EDE0;//#1B002B;
-    branchColor = #F5EE34; //#43e97b;
-    leafColor = #E82503;//#ffffff;
+  case 4:
+    trunkColor = #00EDE0;
+    branchColor = #F5EE34;
+    leafColor = color(232, 37, 3, 110); 
 
-    highSkyColor = #0250c5/*#a6c0fe*/;
-    lowSkyColor = #d43f8d;//#f68084;
+    highSkyColor = #0250c5;
+    lowSkyColor = #d43f8d;
     lowFloorColor = #e772d1;
     highFloorColor = #6bc9c1;
     sunColor = color(255, 204, 65, 220);
@@ -217,7 +227,7 @@ void updatePalette() {
   case 1:
     trunkColor = #1B002B;
     branchColor = #43e97b;
-    leafColor = #ffffff;
+    leafColor = color(255, 255, 255, 80);
 
     highSkyColor = #a6c0fe;
     lowSkyColor = #f68084;
@@ -230,7 +240,7 @@ void updatePalette() {
   case 2:
     trunkColor = #0e0402;
     branchColor = #722418;
-    leafColor = #d7492e;
+    leafColor = color(215, 73, 46, 110);
 
     highSkyColor = #4d83c1;
     lowSkyColor = #f5ba76;
@@ -240,10 +250,10 @@ void updatePalette() {
     pathColor = color(57, 0, 7, 100);
     break;
 
-  case 0:
+  case 3:
     trunkColor = #4c3828;
     branchColor = #58704c;
-    leafColor = #bcc329;
+    leafColor = color(188, 195, 41, 110);
 
     highSkyColor = #2958dc;
     lowSkyColor = #6295d0;
@@ -251,6 +261,19 @@ void updatePalette() {
     highFloorColor = #c5a68a;
     sunColor = color(250, 252, 239, 200);
     pathColor = color(67, 58, 51, 120);
+    break;
+
+  case 0:
+    trunkColor = #191d26;
+    branchColor = #0a1832;
+    leafColor = color(101, 83, 99, 50);
+
+    highSkyColor = #e8cfd2;
+    lowSkyColor = #ffdae1;
+    lowFloorColor = #655363;
+    highFloorColor = #d0a7b9;
+    sunColor = color(255, 250, 229, 250);
+    pathColor = color(9, 25, 50, 120);
     break;
 
   default:
